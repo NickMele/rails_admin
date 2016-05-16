@@ -92,7 +92,7 @@ module RailsAdmin
           datetime_with_wrong_tz = ::DateTime.strptime(delocalized_value, strftime_format.gsub('%-d', '%d'))
           Time.zone.parse(datetime_with_wrong_tz.strftime('%Y-%m-%d %H:%M:%S'))
         rescue ArgumentError
-          nil
+          Time.zone.parse(delocalized_value)
         end
       end
     end
