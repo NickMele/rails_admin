@@ -43,6 +43,10 @@ module RailsAdmin
           "#{type}_type"
         end
 
+        def required_css_class
+          "required" if required?
+        end
+
         def virtual?
           properties.blank?
         end
