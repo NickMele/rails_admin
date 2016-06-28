@@ -13,9 +13,6 @@
   $.widget("ra.filteringMultiselect", {
     _cache: {},
     options: {
-      createQuery: function(query) {
-        return { query: query };
-      },
       sortable: false,
       removable: true,
       regional: {
@@ -257,7 +254,7 @@
               xhr.setRequestHeader("Accept", "application/json");
             },
             url: this.options.remote_source,
-            data: this.options.createQuery(query),
+            data: this._createQuery(query),
             success: success
           });
 
@@ -275,6 +272,32 @@
           success.apply(this, [matches]);
         }
       }
+    },
+
+    _createQuery: function(query) {
+      var self = this;
+      var data = { query: query };
+
+      $.each(self.options.filter_by, function(index, fieldIds) {
+        var fieldName = fieldIds.length && fieldIds[0];
+        var fieldId = fieldIds.length && fieldIds[1];
+        var $field = $('#' + fieldId);
+        var value = $field.val();
+        var filters = {};
+
+        filters[fieldName] = {
+          '0000': {
+            o: 'is',
+            v: value
+          }
+        };
+
+        $.extend(data, {
+          f: filters
+        });
+      });
+
+      return data;
     },
 
     _select: function(options) {

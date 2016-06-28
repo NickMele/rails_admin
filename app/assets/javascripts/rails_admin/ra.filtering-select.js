@@ -18,9 +18,6 @@
 
   $.widget('ra.filteringSelect', {
     options: {
-      createQuery: function(query) {
-        return { query: query };
-      },
       minLength: 0,
       searchDelay: 200,
       remote_source: null,
@@ -117,8 +114,8 @@
 
           this.xhr = $.ajax({
             url: source,
-            data: self.options.createQuery(request.term),
-            dataType: 'json',
+            data: self._createQuery(request.term),
+            dataType: "json",
             autocompleteRequest: ++requestIndex,
             success: function(data, status) {
               if (this.autocompleteRequest === requestIndex) {
@@ -275,6 +272,32 @@
           .html(item.html || item.id))
           .appendTo(ul);
       };
+    },
+
+    _createQuery: function(query) {
+      var self = this;
+      var data = { query: query };
+
+      $.each(self.options.filter_by, function(index, fieldIds) {
+        var fieldName = fieldIds.length && fieldIds[0];
+        var fieldId = fieldIds.length && fieldIds[1];
+        var $field = $('#' + fieldId);
+        var value = $field.val();
+        var filters = {};
+
+        filters[fieldName] = {
+          '0000': {
+            o: 'is',
+            v: value
+          }
+        };
+
+        $.extend(data, {
+          f: filters
+        });
+      });
+
+      return data;
     },
 
     destroy: function() {

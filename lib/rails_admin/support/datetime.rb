@@ -16,6 +16,7 @@ module RailsAdmin
         '%F' => 'YY-MM-DD',   # ISO 8601 date format
         '%H' => 'HH',         # Hour of the day, 24-hour clock (00..23)
         '%I' => 'hh',         # Hour of the day, 12-hour clock (01..12)
+        '%l' => 'h',          # Hour of the day, 12-hour clock (1..12)
         '%m' => 'MM',         # Month of the year (01..12)
         '%-m' => 'M',         # Month of the year (1..12)
         '%M' => 'mm',         # Minute of the hour (00..59)
