@@ -139,6 +139,9 @@ module RailsAdmin
           filters_dump.each do |_, filter_dump|
             wb = WhereBuilder.new(scope)
             field = fields.detect { |f| f.name.to_s == field_name }
+
+            return scope if field.nil?
+
             value = parse_field_value(field, filter_dump[:v])
 
             wb.add(field, value, (filter_dump[:o] || 'default'))
@@ -199,11 +202,11 @@ module RailsAdmin
 
         def build_statement_for_type
           case @type
-          when :boolean                   then build_statement_for_boolean
-          when :integer, :decimal, :float then build_statement_for_integer_decimal_or_float
-          when :string, :text             then build_statement_for_string_or_text
-          when :enum                      then build_statement_for_enum
-          when :belongs_to_association    then build_statement_for_belongs_to_association
+          when :boolean                       then build_statement_for_boolean
+          when :integer, :decimal, :float     then build_statement_for_integer_decimal_or_float
+          when :string, :text                 then build_statement_for_string_or_text
+          when :enum                          then build_statement_for_enum
+          when :belongs_to_association, :uuid then build_statement_for_belongs_to_association
           end
         end
 
@@ -218,7 +221,11 @@ module RailsAdmin
 
         def build_statement_for_belongs_to_association
           return if @value.blank?
-          ["(#{@column} = ?)", @value.to_i] if @value.to_i.to_s == @value
+          return if @type != :uuid && @value.to_i.to_s != @value
+          return if @type == :uuid && (@value =~ /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/).nil?
+
+          return ["(#{@column} = ?)", @value.to_s] if @type == :uuid
+          return ["(#{@column} = ?)", @value.to_i] if @type != :uuid
         end
 
         def build_statement_for_string_or_text

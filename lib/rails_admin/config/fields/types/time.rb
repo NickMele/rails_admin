@@ -14,8 +14,16 @@ module RailsAdmin
             ::DateTime.parse(value_with_tz.strftime('%Y-%m-%d %H:%M:%S'))
           end
 
+          register_instance_option :time_format do
+            :time
+          end
+
           register_instance_option :strftime_format do
-            '%H:%M'
+            begin
+              ::I18n.t(time_format, scope: i18n_scope, raise: true)
+            rescue ::I18n::ArgumentError
+              '%H:%M'
+            end
           end
         end
       end
