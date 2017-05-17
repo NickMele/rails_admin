@@ -28,6 +28,10 @@ module RailsAdmin
           parent.abstract_model.primary_key
         end
 
+        register_instance_option :query_method do
+          nil
+        end
+
         register_instance_option :sort_reverse? do
           true # By default show latest first
         end
