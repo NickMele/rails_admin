@@ -120,14 +120,20 @@ module RailsAdmin
     end
 
     def get_collection(model_config, scope, pagination)
-      associations = model_config.list.fields.select { |f| f.try(:eager_load?) }.collect { |f| f.association.name }
+      associations = model_config.list.fields.select do |f|
+        f.type == :belongs_to_association || f.type == :has_many_association || f.type == :has_one_association && !f.polymorphic?
+      end.collect { |f| f.association.name }  if (params[:query].present? || params[:f].present?)
+      associations = model_config.list.fields.select { |f| f.type == :belongs_to_association && !f.polymorphic? }.collect { |f| f.association.name } if (!params[:query].present? && !params[:f].present?)
       options = {}
-      options = options.merge(page: (params[Kaminari.config.param_name] || 1).to_i, per: (params[:per] || model_config.list.items_per_page)) if pagination
-      options = options.merge(include: associations) unless associations.blank?
+      options = options.merge(:page => (params[:page] || 1).to_i,
+        :per => (params[:per] || model_config.list.items_per_page)) if pagination
+      options = options.merge(:include => associations) unless associations.blank?
       options = options.merge(get_sort_hash(model_config))
-      options = options.merge(query: params[:query]) if params[:query].present?
-      options = options.merge(filters: params[:f]) if params[:f].present?
-      options = options.merge(bulk_ids: params[:bulk_ids]) if params[:bulk_ids]
+      options = options.merge(:query => params[:query]) if params[:query].present?
+      options = options.merge(:query_method => model_config.list.query_method) if model_config.list.query_method.present?
+      options = options.merge(:filters => params[:f]) if params[:f].present?
+      options = options.merge(:bulk_ids => params[:bulk_ids]) if params[:bulk_ids]
+
       model_config.abstract_model.all(options, scope)
     end
 
