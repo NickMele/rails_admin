@@ -274,6 +274,19 @@ describe RailsAdmin::Config do
     end
   end
 
+  describe '.forgery_protection_settings' do
+    it 'uses with: :exception by default' do
+      expect(RailsAdmin.config.forgery_protection_settings).to eq(with: :exception)
+    end
+
+    it 'allows to customize settings' do
+      RailsAdmin.config do |config|
+        config.forgery_protection_settings = {with: :null_session}
+      end
+      expect(RailsAdmin.config.forgery_protection_settings).to eq(with: :null_session)
+    end
+  end
+
   describe '.model' do
     let(:fields) { described_class.model(Team).fields }
     before do
@@ -312,6 +325,44 @@ describe RailsAdmin::Config do
       it 'executes first' do
         expect(fields.find { |f| f.name == :players }.visible).to be false
       end
+    end
+  end
+
+  describe "field types code reloading" do
+    let(:config) { described_class.model(Team) }
+    let(:fields) { described_class.model(Team).edit.fields }
+
+    let(:team_config) do
+      proc do
+        field :id
+        field :wins, :boolean
+      end
+    end
+    let(:team_config2) do
+      proc do
+        field :wins, :toggle
+      end
+    end
+
+    it "allows code reloading" do
+      Team.send(:rails_admin, &team_config)
+
+      # This simulates the way RailsAdmin really does it
+      config.edit.send(:_fields, true)
+
+      module RailsAdmin
+        module Config
+          module Fields
+            module Types
+              class Toggle < RailsAdmin::Config::Fields::Base
+                RailsAdmin::Config::Fields::Types.register(self)
+              end
+            end
+          end
+        end
+      end
+      Team.send(:rails_admin, &team_config2)
+      expect(fields.map(&:name)).to match_array %i(id wins)
     end
   end
 end

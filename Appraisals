@@ -21,10 +21,10 @@ appraise "rails-4.0" do
     gem 'kaminari-mongoid', '~> 0.1'
     gem 'mongoid-paperclip', '>= 0.0.8', require: 'mongoid_paperclip'
     gem 'carrierwave-mongoid', '>= 0.6.3', require: 'carrierwave/mongoid'
-    gem 'refile-mongoid', github: 'DimaSamodurov/refile-mongoid', platforms: [:ruby_21, :ruby_22, :ruby_23]
+    gem 'refile-mongoid', github: 'DimaSamodurov/refile-mongoid', platforms: :ruby
   end
 
-  platforms :ruby_21, :ruby_22, :ruby_23 do
+  platforms :ruby do
     gem 'refile', '~> 0.5', require: 'refile/rails'
     gem 'refile-mini_magick', '>= 0.1.0'
   end
@@ -50,10 +50,10 @@ appraise "rails-4.1" do
     gem 'kaminari-mongoid'
     gem 'mongoid-paperclip', '>= 0.0.8', require: 'mongoid_paperclip'
     gem 'carrierwave-mongoid', '>= 0.6.3', require: 'carrierwave/mongoid'
-    gem 'refile-mongoid', github: 'DimaSamodurov/refile-mongoid', platforms: [:ruby_21, :ruby_22, :ruby_23]
+    gem 'refile-mongoid', github: 'DimaSamodurov/refile-mongoid', platforms: :ruby
   end
 
-  platforms :ruby_21, :ruby_22, :ruby_23 do
+  platforms :ruby do
     gem 'refile', '~> 0.5', require: 'refile/rails'
     gem 'refile-mini_magick', '>= 0.1.0'
   end
@@ -80,10 +80,10 @@ appraise "rails-4.2" do
     gem 'kaminari-mongoid'
     gem 'mongoid-paperclip', '>= 0.0.8', require: 'mongoid_paperclip'
     gem 'carrierwave-mongoid', '>= 0.6.3', require: 'carrierwave/mongoid'
-    gem 'refile-mongoid', github: 'DimaSamodurov/refile-mongoid', platforms: [:ruby_21, :ruby_22, :ruby_23]
+    gem 'refile-mongoid', github: 'DimaSamodurov/refile-mongoid', platforms: :ruby
   end
 
-  platforms :ruby_21, :ruby_22, :ruby_23 do
+  platforms :ruby do
     gem 'refile', '~> 0.5', require: 'refile/rails'
     gem 'refile-mini_magick', '>= 0.1.0'
   end
@@ -115,14 +115,40 @@ end
 appraise "rails-5.1" do
   gem 'rails', '~> 5.1.0'
   gem 'sass-rails', '~> 5.0'
-  gem 'devise', github: 'plataformatec/devise'
+  gem 'devise', '~> 4.0'
 
   group :active_record do
+    gem 'pg', '~> 0.14', platforms: :ruby
+    gem 'paper_trail', '>= 5.0'
+
+    platforms :jruby do
+      gem 'activerecord-jdbcmysql-adapter', '~> 51.0'
+      gem 'activerecord-jdbcpostgresql-adapter', github: "jruby/activerecord-jdbc-adapter"
+      gem 'activerecord-jdbcsqlite3-adapter', '~> 51.0'
+    end
+  end
+
+  group :mongoid do
+    gem 'mongoid', '~> 6.0'
+    gem 'kaminari-mongoid'
+    gem 'mongoid-paperclip', '>= 0.0.8', require: 'mongoid_paperclip'
+    gem 'carrierwave-mongoid', '>= 0.6.3', require: 'carrierwave/mongoid'
+  end
+end
+
+appraise "rails-5.2" do
+  gem 'rails', '~> 5.2.0'
+  gem 'sass-rails', '~> 5.0'
+  gem 'devise', '~> 4.4'
+
+  group :active_record do
+    gem 'pg', '>= 1.0.0', platforms: :ruby
+    gem 'cancancan', '~> 1.12', github: 'mshibuya/cancancan', branch: 'topic-backport-rails-5-2-support-to-1-x'
     gem 'paper_trail', '>= 5.0'
   end
 
   group :mongoid do
-    gem 'mongoid', '>= 6.0.0.beta'
+    gem 'mongoid', '~> 6.4'
     gem 'kaminari-mongoid'
     gem 'mongoid-paperclip', '>= 0.0.8', require: 'mongoid_paperclip'
     gem 'carrierwave-mongoid', '>= 0.6.3', require: 'carrierwave/mongoid'
